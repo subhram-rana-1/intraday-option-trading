@@ -1,0 +1,25 @@
+{
+    "user_input": [
+        {
+            "strategy_type": "LONG_MOMENTUM_CALL",
+            "should_run": true,
+            "trade_type": "PAPER",
+            "market": "NIFTY",
+            "lot_qty": 1,
+        },
+        {
+            "strategy_type": "LONG_MOMENTUM_PUT",
+            "should_run": true,
+            "trade_type": "PAPER",
+            "market": "NIFTY",
+            "lot_qty": 1,
+        },
+        {
+            "strategy_type": "SHORT_STRANGLE",
+            "should_run": true,
+            "trade_type": "PAPER",
+            "market": "BANKNIFTY",
+            "lot_qty": 1,
+        },
+    ]
+}
