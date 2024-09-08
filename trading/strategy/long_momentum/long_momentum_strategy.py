@@ -1,7 +1,7 @@
 import time as tm
 from trading.common.entities.time_range import TimeRange
 from trading.common.enums import TradeType, Market, StrategyType, TradeState
-from trading.models import Trade
+from trading.models import Trade, Order
 from trading.strategy import IStrategy
 from abc import ABC, abstractmethod
 from typing import List
@@ -40,8 +40,14 @@ class LongMomentumStrategy(IStrategy, ABC):
 
             tm.sleep(1)
 
-    def _get_latest_trade_for_this_strategy(self) -> Trade:
-        """TODO"""
+    @classmethod
+    def _get_latest_trade_for_this_strategy(cls) -> Trade:
+        try:
+            latest_trade: Trade = Trade.objects.latest('id')
+        except Trade.DoesNotExist:
+            latest_trade = None
+
+        return latest_trade
 
     def _try_buying(self) -> Trade:
         """TODO"""
