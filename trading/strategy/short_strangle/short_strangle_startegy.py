@@ -4,4 +4,4 @@ from trading.strategy import IStrategy
 
 class ShortStrangleStrategy(IStrategy):
     def start(self, trade_type: TradeType, market: Market, lot_qty: int):
-        pass
+        raise NotImplemented
