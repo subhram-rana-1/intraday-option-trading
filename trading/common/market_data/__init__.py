@@ -3,7 +3,12 @@ from trading.broker.kite import config as kite_config
 from trading.common.market_data.market_data_manager import MarketDataManager
 
 
-def new_kite_connect_client() -> KiteConnect:
+kite_connect_client: KiteConnect = None
+
+
+def new_kite_connect_client():
+    global kite_connect_client
+
     kc: KiteConnect = KiteConnect(
         api_key=kite_config.API_KEY,
     )
@@ -21,11 +26,12 @@ def new_kite_connect_client() -> KiteConnect:
     kite_config.ACCESS_TOKEN = session_data['access_token']
     kc.set_access_token(kite_config.ACCESS_TOKEN)
 
-    print('\nkite connect client creation successful !!! ')
+    kite_connect_client = kc
 
-    return kc
+    print('\nkite connect client creation successful !!! ')
 
 
 def initialise_market_data_fetcher_client():
-    kc: KiteConnect = new_kite_connect_client()
-    MarketDataManager.bootstrap(kc)
+    new_kite_connect_client()
+
+    MarketDataManager.bootstrap(kite_connect_client)

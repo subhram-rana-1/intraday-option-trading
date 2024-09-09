@@ -6,6 +6,7 @@
             "trade_type": "PAPER",
             "market": "NIFTY",
             "lot_qty": 1,
+            "broker_code": "UPSTOX"
         },
         {
             "strategy_type": "LONG_MOMENTUM_PUT",
@@ -13,6 +14,7 @@
             "trade_type": "PAPER",
             "market": "NIFTY",
             "lot_qty": 1,
+            "broker_code": "KITE"
         },
         {
             "strategy_type": "SHORT_STRANGLE",
@@ -20,6 +22,7 @@
             "trade_type": "PAPER",
             "market": "BANKNIFTY",
             "lot_qty": 1,
+            "broker_code": "KITE"
         },
     ]
 }

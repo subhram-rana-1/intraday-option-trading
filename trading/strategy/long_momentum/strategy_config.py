@@ -15,7 +15,14 @@ class LongMomentumStrategyConfig:
             end=time(15, 15, 0),
         )
     ]
+    root_sl_deviation_pt = 6
+    min_profit_pt = 10
+    max_allowed_price_fluctuation_pt = 10
 
     @property
     def min_entry_time(self) -> time:
         return self.allowed_time_ranges_for_entry[0].start
+
+    @property
+    def max_entry_time(self) -> time:
+        return self.allowed_time_ranges_for_entry[-1].end

@@ -153,7 +153,7 @@ def subscribe_to_nifty_instrument(ws, response):
 
 def update_nifty_ltp(ws, ticks):
     stock_data: TickerData = ticks[0]
-    MarketDataManager.live_price_info.nifty_ltp = stock_data['last_price']
+    MarketDataManager.live_price_info.nifty['last_price'] = stock_data['last_price']
 
 
 def start_fetching_and_updating_banknifty_price():
@@ -183,7 +183,7 @@ def subscribe_to_banknifty_instrument(ws, response):
 
 def update_banknifty_ltp(ws, ticks):
     stock_data: TickerData = ticks[0]
-    MarketDataManager.live_price_info.banknifty_ltp = stock_data['last_price']
+    MarketDataManager.live_price_info.banknifty['last_price'] = stock_data['last_price']
 
 
 def close_websocket_connection(ws, code, reason):

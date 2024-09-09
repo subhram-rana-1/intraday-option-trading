@@ -1,0 +1,2 @@
+class InvalidBrokerException(Exception):
+    pass

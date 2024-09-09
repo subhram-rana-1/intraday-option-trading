@@ -1,5 +1,7 @@
 import json
 from typing import List
+
+from trading.broker import BrokerCode
 from trading.common.constants import user_input_json_file_relative_path
 from trading.common.enums import StrategyType, TradeType, Market
 
@@ -12,12 +14,14 @@ class StrategyInput:
             trade_type: str,
             market: str,
             lot_qty: int,
+            broker_code: str,
     ):
         self.strategy_type = StrategyType(strategy_type)
         self.should_run = should_run
         self.trade_type = TradeType(trade_type)
         self.market = Market(market)
         self.lot_qty = lot_qty
+        self.broker_code = BrokerCode(broker_code)
 
 
 class UserInput:
@@ -42,6 +46,7 @@ class UserInput:
                     strategy_input_dict['trade_type'],
                     strategy_input_dict['market'],
                     strategy_input_dict['lot_qty'],
+                    strategy_input_dict['broker_code'],
                 )
 
                 input._append_strategy_input(strategy_input_obj)

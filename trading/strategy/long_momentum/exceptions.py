@@ -1,0 +1,2 @@
+class InvalidBrokerCodeToInitialiseStrategyException(Exception):
+    pass
