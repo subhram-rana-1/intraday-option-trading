@@ -3,14 +3,12 @@ import time as tm
 from trading.broker import BrokerCode, KiteBroker, UpstoxBroker, IBroker
 from trading.common.entities.time_range import TimeRange
 from trading.common.entities.user_input import StrategyInput
-from trading.common.enums import TradeType, Market, StrategyType, TradeState
+from trading.common.enums import Market, StrategyType, TradeState
+from trading.common.utils import improvisation
 from trading.models import Trade, Order
 from trading.strategy import IStrategy
 from abc import ABC, abstractmethod
-from typing import List
 from datetime import datetime, time
-
-from trading.strategy.long_momentum.exceptions import InvalidBrokerCodeToInitialiseStrategyException
 from trading.strategy.long_momentum.live_info import LongMomentumStrategyLiveInfo
 from trading.strategy.long_momentum.strategy_config import LongMomentumStrategyConfig
 
@@ -35,7 +33,7 @@ class LongMomentumStrategy(IStrategy, ABC):
     def strategy_type(self) -> StrategyType:
         ...
 
-    def start(self, trade_type: TradeType, market: Market, lot_qty: int):
+    def start(self, market: Market, lot_qty: int):
         while True:
             cur_time: time = datetime.now().time()
             trade: Trade = self._get_latest_trade_for_this_strategy()
@@ -96,7 +94,7 @@ class LongMomentumStrategy(IStrategy, ABC):
                 return
 
             # else train the SL
-            self.trail_SL()
+            self._trail_SL()
 
             tm.sleep(1)
 
@@ -111,15 +109,40 @@ class LongMomentumStrategy(IStrategy, ABC):
     def _is_entry_possible(self) -> bool:
         ...
 
+    def is_SL_hit(self) -> bool:
+        if self.live_info.option_ltp <= self.live_info.root_stoploss:
+            return True
+
+        if self.live_info.cur_stoploss is not None and \
+                self.live_info.option_ltp <= self.live_info.cur_stoploss:
+            return True
+
+        return False
+
+    @improvisation('while setting up first self.live_info.cur_stoploss')
+    def _trail_SL(self):
+        if self.live_info.cur_stoploss is not None:
+            # try to trail the SL
+            new_stoploss = self.live_info.option_ltp - self.strategy_config.max_allowed_price_fluctuation_pt
+            self.live_info.cur_stoploss = max(self.live_info.cur_stoploss, new_stoploss)
+        else:
+            # Try to initialise cur_stoploss is possible
+            if self.live_info.option_ltp >= \
+                    self.live_info.buying_price + self.strategy_config.min_profit_pt + \
+                    self.strategy_config.max_allowed_price_fluctuation_pt:
+                self.live_info.cur_stoploss = \
+                    self.live_info.option_ltp - self.strategy_config.max_allowed_price_fluctuation_pt
+
     def _buy(self):
-        self.broker.Sell()  # TODO add alt of arguments, save in DB
+        """
+        TODO
+        1. call broker Buy() function
+        2. Save in 'trade' and 'order' DB table
+        """
 
     def _sell(self):
-        self.broker.Sell()  # TODO add alt of arguments, save in DB
-
-    def is_SL_hit(self) -> bool:
-        return self.live_info.option_ltp <= self.live_info.cur_stoploss
-
-    def trail_SL(self):
-        new_stoploss = self.live_info.option_ltp
-        self.live_info.cur_stoploss = max(self.live_info.cur_stoploss, new_stoploss)
+        """
+        TODO
+        1. call broker Sell() function
+        2. Save in 'order' DB table
+        """

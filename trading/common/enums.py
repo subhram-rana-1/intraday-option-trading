@@ -11,11 +11,6 @@ class DjangoEnum(Enum):
         return choices_from_enum(cls)
 
 
-class TradeType(DjangoEnum):
-    PAPER = 'PAPER'
-    LIVE = 'LIVE'
-
-
 class Market(DjangoEnum):
     NIFTY = 'NIFTY'
     BANKNIFTY = 'BANKNIFTY'

@@ -3,7 +3,7 @@ from typing import List
 
 from trading.broker import BrokerCode
 from trading.common.constants import user_input_json_file_relative_path
-from trading.common.enums import StrategyType, TradeType, Market
+from trading.common.enums import StrategyType, Market
 
 
 class StrategyInput:
@@ -18,7 +18,6 @@ class StrategyInput:
     ):
         self.strategy_type = StrategyType(strategy_type)
         self.should_run = should_run
-        self.trade_type = TradeType(trade_type)
         self.market = Market(market)
         self.lot_qty = lot_qty
         self.broker_code = BrokerCode(broker_code)

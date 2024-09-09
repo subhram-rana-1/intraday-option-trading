@@ -19,6 +19,7 @@ class Trade(models.Model):
     state = EnumField(choices=TradeState.choices(), null=False)
     day = models.DateField(null=False)
     initiation_time = models.TimeField(null=False)
+    root_stoploss = models.DecimalField(null=True)
     completion_time = models.TimeField(null=False)
 
 
