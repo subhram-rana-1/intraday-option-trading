@@ -44,7 +44,7 @@ class LongMomentumStrategyLiveInfo(ABC):
                 self.root_stoploss: float = trade.root_stoploss
                 self.buying_price: float = order.order_confirmation_price
                 self.option_symbol: str = order.instrument_symbol
-                self.option_instrument_token = InstrumentData.get_token_from_nfo_instrument(order.instrument_symbol)
+                self.option_instrument_token = InstrumentData.get_nfo_instrument_token_from_symbol(order.instrument_symbol)
                 self.option_ltp = None
                 self.cur_stoploss = None
 

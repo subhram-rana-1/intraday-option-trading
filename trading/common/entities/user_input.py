@@ -11,7 +11,6 @@ class StrategyInput:
             self,
             strategy_type: str,
             should_run: bool,
-            trade_type: str,
             market: str,
             lot_qty: int,
             broker_code: str,
@@ -40,7 +39,6 @@ class UserInput:
 
             for strategy_input_dict in data:
                 strategy_input_obj: StrategyInput = StrategyInput(
-                    strategy_input_dict['strategy_type'],
                     strategy_input_dict['should_run'],
                     strategy_input_dict['trade_type'],
                     strategy_input_dict['market'],

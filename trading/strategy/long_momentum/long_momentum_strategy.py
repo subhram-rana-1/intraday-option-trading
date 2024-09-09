@@ -1,11 +1,14 @@
 import time as tm
-
 from trading.broker import BrokerCode, KiteBroker, UpstoxBroker, IBroker
+from trading.common.constants import IST_timezone
 from trading.common.entities.time_range import TimeRange
+from django.db import transaction
 from trading.common.entities.user_input import StrategyInput
-from trading.common.enums import Market, StrategyType, TradeState
-from trading.common.utils import improvisation
-from trading.models import Trade, Order
+from trading.common.enums import Market, StrategyType, TradeState, OrderPriceType, OrderStatus
+from trading.common.market_data.instrument_data import InstrumentData
+from trading.common.market_data.live_price_info import LivePriceInfo
+from trading.common.utils import improvisation, get_quantity_from_lot_quantity
+from trading.models import Trade, Order, Strategy
 from trading.strategy import IStrategy
 from abc import ABC, abstractmethod
 from datetime import datetime, time
@@ -133,12 +136,46 @@ class LongMomentumStrategy(IStrategy, ABC):
                 self.live_info.cur_stoploss = \
                     self.live_info.option_ltp - self.strategy_config.max_allowed_price_fluctuation_pt
 
+    @transaction.atomic
     def _buy(self):
         """
         TODO
         1. call broker Buy() function
         2. Save in 'trade' and 'order' DB table
         """
+        current_market_price = self._get_market_price()
+        root_stoploss = self._get_root_stoploss_from_market_price(current_market_price)
+        instrument_symbol: str = self._get_instrument_symbol_from_market_price(current_market_price)
+        instrument_token: int = InstrumentData.get_nfo_instrument_token_from_symbol(instrument_symbol)  # required when calling Buy() function
+
+        self.broker.Buy()  # TODO: pass more details, not required for paper trading
+
+        strategy: Strategy = Strategy.objects.get(name=self.strategy_type.value)
+        trade: Trade = Trade(
+            strategy=strategy,
+            broker=self.strategy_input.broker_code,
+            state=TradeState.IN_PROGRESS,
+            day=datetime.today().day,
+            initiation_time=datetime.now().astimezone(IST_timezone).time(),
+            root_stoploss=root_stoploss,
+        )
+        trade.save()
+
+        order: Order = Order(
+            broker_txn_id='fake_txn_id',  # to fetch from Buy() function call
+            trade=trade,
+            txn_type='BUY',
+            instrument_symbol=instrument_symbol,
+            qty=get_quantity_from_lot_quantity(self.strategy_input.market, self.strategy_input.lot_qty),
+            price_type=OrderPriceType.MARKET,
+            status=OrderStatus.CONFIRMED,  # TODO: to get it from Buy() api call
+            order_request_time='',
+            order_request_price='',
+            order_confirmation_time='',
+            order_confirmation_price='',
+            tot_amount='',
+        )
+        order.save()
 
     def _sell(self):
         """
@@ -146,3 +183,20 @@ class LongMomentumStrategy(IStrategy, ABC):
         1. call broker Sell() function
         2. Save in 'order' DB table
         """
+
+    def _get_market_price(self) -> float:
+        market: Market = self.strategy_input.market
+
+        if market == Market.NIFTY:
+            return LivePriceInfo.nifty['last_price']
+        elif market == Market.NIFTY:
+            return LivePriceInfo.banknifty['last_price']
+
+        raise Exception(f'invalid market type: {market.value}')
+
+    def _get_root_stoploss_from_market_price(self, market_price: float) -> float:
+        return market_price - self.strategy_config.root_sl_deviation_pt
+
+    @abstractmethod
+    def _get_instrument_symbol_from_market_price(self, current_market_price: float) -> str:
+        ...

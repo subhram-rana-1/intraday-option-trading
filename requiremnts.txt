@@ -2,3 +2,4 @@ kiteconnect
 Django==5.1
 django-mysql==4.5.0
 mysqlclient==1.4.2.post1
+pytz

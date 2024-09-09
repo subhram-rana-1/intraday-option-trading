@@ -40,8 +40,8 @@ class TxnType(DjangoEnum):
 
 
 class OrderPriceType(DjangoEnum):
-    BUY = 'MARKET'
-    SELL = 'LIMIT'
+    MARKET = 'MARKET'
+    LIMIT = 'LIMIT'
 
 
 class OrderStatus(DjangoEnum):
